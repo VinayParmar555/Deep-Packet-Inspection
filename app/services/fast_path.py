@@ -30,7 +30,6 @@ class FastPathProcessor:
         self.input_queue: asyncio.Queue[PacketSchema] = asyncio.Queue()
         self.conn_tracker = ConnectionTracker(fp_id=fp_id)
 
-        self.running = False
         self.task: asyncio.Task | None = None
 
         # Stats
@@ -47,26 +46,36 @@ class FastPathProcessor:
     # ==================================================
 
     async def start(self):
-        self.running = True
-        self.task = asyncio.create_task(self.run())
+        if not self.task or self.task.done():
+            self.task = asyncio.create_task(self.run())
 
     async def stop(self):
-        self.running = False
         if self.task:
-            await self.task
+            self.task.cancel()
+            try:
+                await self.task
+            except asyncio.CancelledError:
+                pass
+            self.task = None
 
     # ==================================================
     # Main Loop
     # ==================================================
 
     async def run(self):
-        while self.running:
-            packet = await self.input_queue.get()
-            action = await self.process_packet(packet)
+        try:
+            while True:
+                packet = await self.input_queue.get()
+                action = await self.process_packet(packet)
 
-            await self.output_callback(packet, action)
+                await self.output_callback(packet, action)
 
-            self.input_queue.task_done()
+                self.input_queue.task_done()
+
+        except asyncio.CancelledError:
+            # graceful shutdown
+            # optionally drain queue if needed
+            pass
 
     # ==================================================
     # Core Logic
