@@ -50,16 +50,13 @@ async def ingest(packet: PacketSchema):
 async def get_stats():
     return await engine.get_stats()
 
-
 @app.get("/stats/connections", tags=["Monitoring"])
 async def get_active_connections():
     return await engine.get_active_connections()
 
-
 @app.get("/stats/apps", tags=["Monitoring"])
 async def get_app_stats():
     return await engine.get_app_stats()
-
 
 @app.get("/health", tags=["Monitoring"])
 async def health_check():
