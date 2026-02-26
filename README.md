@@ -1,21 +1,5 @@
 # 🚀 DPI Backend Service
 
-### Deep Packet Inspection Microservice (FastAPI + Redis + Async Workers)
-
-```{=html}
-<p align="center">
-```
-`<img src="https://img.shields.io/badge/Python-3.11-blue?logo=python"/>`{=html}
-`<img src="https://img.shields.io/badge/FastAPI-Async-green?logo=fastapi"/>`{=html}
-`<img src="https://img.shields.io/badge/Redis-Rule%20Engine-red?logo=redis"/>`{=html}
-`<img src="https://img.shields.io/badge/Architecture-Flow%20Based-orange"/>`{=html}
-`<img src="https://img.shields.io/badge/Status-Production%20Ready-brightgreen"/>`{=html}
-```{=html}
-</p>
-```
-
-------------------------------------------------------------------------
-
 ## 📌 Overview
 
 This project implements a **Deep Packet Inspection (DPI) backend
@@ -223,11 +207,3 @@ POST /ingest
 -   gRPC integration with C++ core
 
 ------------------------------------------------------------------------
-
-```{=html}
-<p align="center">
-```
-`<b>`{=html}Happy Building 🚀`</b>`{=html}
-```{=html}
-</p>
-```
