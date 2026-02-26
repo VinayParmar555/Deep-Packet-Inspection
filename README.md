@@ -79,26 +79,40 @@ sequenceDiagram
 # 📂 Project Structure
 
     app/
-    ├── main.py
     ├── schema/
-    │   ├── packet_schema.py
+    |   ├── common_schema.py
     │   ├── connection_schema.py
-    │   ├── stats_schema.py
-    │   ├── rule_schema.py
     │   ├── dpi_config_schema.py
+    │   ├── packet_schema.py
+    |   ├── parsed_packet_schema.py
+    |   |── pcap_schema.py
+    │   ├── rule_schema.py
+    │   ├── stats_schema.py
     │
     ├── services/
-    │   ├── dpi_engine.py
-    │   ├── dispatcher_service.py
+    │   ├── classification_service.py
     │   ├── connection.py
+    │   ├── dispatcher_service.py
+    │   ├── dpi_engine.py
+    │   ├── extractors_service.py
+    │   ├── fast_path_service.py
+    │   ├── fast_path.py
+    │   ├── flow_processor_service.py
+    │   ├── flow_service.py
+    │   ├── load_balancer.py
+    │   ├── packet_parser_service.py
+    │   ├── pcap_reader_service.py
     │   ├── rule_service.py
-    │
+    │   ├── sni_service.py
+    │   ├── stats_service.py
     ├── cache/
     │   └── redis.py
     │
     ├── utils/
-    │   └── platform.py
-
+    │   ├── packet_analyzer.py
+    |   ├── pcap_test.py
+    |
+    main.py
 ------------------------------------------------------------------------
 
 # 🔐 Flow-Based Blocking
@@ -152,7 +166,7 @@ Thread-safe via async locking.
 ### 1️⃣ Install Dependencies
 
 ``` bash
-pip install fastapi uvicorn redis pydantic
+pip install requirements.txt
 ```
 
 ### 2️⃣ Start Redis
@@ -164,7 +178,7 @@ redis-server
 ### 3️⃣ Run Server
 
 ``` bash
-uvicorn app.main:app --reload
+uvicorn main:app --reload
 ```
 
 ------------------------------------------------------------------------
