@@ -210,14 +210,3 @@ POST /ingest
 -   Production-grade backend architecture
 
 ------------------------------------------------------------------------
-
-# 🚀 Future Enhancements
-
--   Kafka-based packet ingestion
--   QUIC (HTTP/3) detection
--   Prometheus metrics integration
--   Web dashboard
--   Horizontal auto-scaling workers
--   gRPC integration with C++ core
-
-------------------------------------------------------------------------
