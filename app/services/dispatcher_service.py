@@ -1,6 +1,5 @@
 import hashlib
 from typing import List
-
 from app.schema.packet_schema import PacketSchema
 from app.services.fast_path import FastPathProcessor
 from app.services.rule_service import RuleService
@@ -39,11 +38,6 @@ class DispatcherService:
         return "ALLOW"
 
     def _select_processor(self, packet: PacketSchema) -> int:
-        key = f"{packet.src_ip}:{packet.src_port}:{packet.dst_ip}:{packet.dst_port}"
+        key = f"{packet.tuple.src_ip}:{packet.tuple.src_port}:{packet.tuple.dst_ip}:{packet.tuple.dst_port}"
         hash_value = int(hashlib.md5(key.encode()).hexdigest(), 16)
         return hash_value % self.num_processors
-
-    async def handle_output(self, packet: PacketSchema, action: str):
-        # For now, just pass
-        # Can integrate Kafka / file writer here
-        pass
