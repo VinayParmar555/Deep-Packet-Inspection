@@ -10,40 +10,40 @@ class RuleService:
     # ==============================
 
     async def block_ip(self, ip: str):
-        await redis_client.sadd("blocked:ips", ip)
+        await redis_client().sadd("blocked:ips", ip)
 
     async def unblock_ip(self, ip: str):
-        await redis_client.srem("blocked:ips", ip)
+        await redis_client().srem("blocked:ips", ip)
 
     async def is_ip_blocked(self, ip: str) -> bool:
-        return await redis_client.sismember("blocked:ips", ip)
+        return await redis_client().sismember("blocked:ips", ip)
 
     # ==============================
     # App Rules
     # ==============================
 
     async def block_app(self, app: str):
-        await redis_client.sadd("blocked:apps", app)
+        await redis_client().sadd("blocked:apps", app)
 
     async def unblock_app(self, app: str):
-        await redis_client.srem("blocked:apps", app)
+        await redis_client().srem("blocked:apps", app)
 
     async def is_app_blocked(self, app: str) -> bool:
-        return await redis_client.sismember("blocked:apps", app)
+        return await redis_client().sismember("blocked:apps", app)
 
     # ==============================
     # Domain Rules (supports wildcard)
     # ==============================
 
     async def block_domain(self, domain: str):
-        await redis_client.sadd("blocked:domains", domain.lower())
+        await redis_client().sadd("blocked:domains", domain.lower())
 
     async def unblock_domain(self, domain: str):
-        await redis_client.srem("blocked:domains", domain.lower())
+        await redis_client().srem("blocked:domains", domain.lower())
 
     async def is_domain_blocked(self, domain: str) -> bool:
         domain = domain.lower()
-        blocked = await redis_client.smembers("blocked:domains")
+        blocked = await redis_client().smembers("blocked:domains")
 
         for rule in blocked:
             if rule.startswith("*."):
@@ -59,13 +59,13 @@ class RuleService:
     # ==============================
 
     async def block_port(self, port: int):
-        await redis_client.sadd("blocked:ports", port)
+        await redis_client().sadd("blocked:ports", str(port))
 
     async def unblock_port(self, port: int):
-        await redis_client.srem("blocked:ports", port)
+        await redis_client().srem("blocked:ports", str(port))
 
     async def is_port_blocked(self, port: int) -> bool:
-        return await redis_client.sismember("blocked:ports", port)
+        return await redis_client().sismember("blocked:ports", str(port))
 
     # ==============================
     # Combined Rule Check
@@ -92,3 +92,19 @@ class RuleService:
             return BlockReasonSchema(type=BlockType.DOMAIN, detail=domain)
 
         return None
+    
+    # ==============================
+    # Rule Reporting
+    # ==============================
+
+    async def get_blocked_ips(self):
+        return list(await redis_client().smembers("blocked:ips"))
+
+    async def get_blocked_apps(self):
+        return list(await redis_client().smembers("blocked:apps"))
+
+    async def get_blocked_domains(self):
+        return list(await redis_client().smembers("blocked:domains"))
+
+    async def get_blocked_ports(self):
+        return list(await redis_client().smembers("blocked:ports"))
