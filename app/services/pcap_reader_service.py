@@ -1,6 +1,5 @@
 import struct
 from typing import Optional
-
 from app.schema.pcap_schema import (
     PcapGlobalHeaderSchema,
     PcapPacketHeaderSchema,

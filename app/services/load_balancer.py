@@ -1,7 +1,6 @@
 import asyncio
 import hashlib
 from typing import List
-
 from app.schema.packet_schema import PacketSchema
 
 class LoadBalancer:

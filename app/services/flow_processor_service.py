@@ -1,5 +1,3 @@
-# app/services/flow_processor_service.py
-
 from collections import defaultdict
 from app.services.rule_service import RuleService
 from app.schema.packet_schema import PacketSchema

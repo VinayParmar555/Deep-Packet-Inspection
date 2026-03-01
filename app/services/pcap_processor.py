@@ -1,7 +1,4 @@
-import os
-import tempfile
 from typing import Dict, Tuple
-
 from app.services.pcap_reader_service import PcapReader
 from app.services.packet_parser_service import PacketParser
 from app.services.extractors_service import ExtractorService
