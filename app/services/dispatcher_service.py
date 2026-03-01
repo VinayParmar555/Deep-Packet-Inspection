@@ -4,15 +4,12 @@ from app.schema.packet_schema import PacketSchema
 from app.services.fast_path import FastPathProcessor
 from app.services.rule_service import RuleService
 
-
 class DispatcherService:
-    """
-    Python equivalent of FPManager + LoadBalancer.
-    """
 
-    def __init__(self, num_processors: int):
+    def __init__(self, num_processors: int, output_callback):
         self.num_processors = num_processors
         self.rule_service = RuleService()
+        self.output_callback = output_callback
 
         self.processors: List[FastPathProcessor] = []
 
@@ -20,7 +17,7 @@ class DispatcherService:
             processor = FastPathProcessor(
                 fp_id=i,
                 rule_service=self.rule_service,
-                output_callback=self.handle_output,
+                output_callback=self.output_callback,
             )
             self.processors.append(processor)
 

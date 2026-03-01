@@ -18,7 +18,7 @@ class DPIEngine:
         self.config = config
 
         # Core Components
-        self.dispatcher = DispatcherService(config.num_workers)
+        self.dispatcher = DispatcherService(config.num_workers, output_callback=self.handle_output)
         self.connection_tracker = ConnectionTracker(fp_id=0)
         self.rule_service = RuleService()
 
@@ -161,3 +161,12 @@ class DPIEngine:
 
     async def get_connection_stats(self):
         return await self.connection_tracker.get_stats()
+    
+    # ==========================================================
+    # Worker Output Callback
+    # ==========================================================
+
+    async def handle_output(self, result):
+        # Future use: update stats / log / async pipeline
+        # For now just ignore
+        pass
