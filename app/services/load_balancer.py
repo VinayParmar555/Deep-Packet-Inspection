@@ -4,10 +4,6 @@ from typing import List
 from app.schema.packet_schema import PacketSchema
 
 class LoadBalancer:
-    """
-    Python equivalent of C++ LoadBalancer thread.
-    Receives packets and forwards to correct FP queue.
-    """
 
     def __init__(
         self,
