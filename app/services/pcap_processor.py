@@ -8,13 +8,6 @@ from app.schema.pcap_report_schema import PcapAnalysisReport, ConnectionDetail
 
 
 class PcapProcessor:
-    """
-    Wires together the full DPI pipeline:
-    PcapReader → PacketParser → ExtractorService → ClassificationService → RuleService
-
-    This is the Python equivalent of main_working.cpp — reads a .pcap file,
-    parses every packet, extracts domains, classifies apps, and checks rules.
-    """
 
     def __init__(self):
         self.parser = PacketParser()
@@ -23,18 +16,13 @@ class PcapProcessor:
         self.rule_service = RuleService()
 
     async def analyze(self, pcap_path: str) -> PcapAnalysisReport:
-        """
-        Analyze a .pcap file and return a full DPI report.
-        """
 
         reader = PcapReader()
         if not reader.open(pcap_path):
             raise ValueError(f"Failed to open PCAP file: {pcap_path}")
 
-        # Flow table: (src_ip, dst_ip, src_port, dst_port, protocol) → ConnectionDetail
         flows: Dict[Tuple, ConnectionDetail] = {}
 
-        # Stats
         total_packets = 0
         tcp_packets = 0
         udp_packets = 0
@@ -45,16 +33,19 @@ class PcapProcessor:
         domains_detected = set()
         app_breakdown: Dict[str, int] = {}
 
-        # ---- Process each packet ----
         while True:
             raw = reader.read_next_packet()
             if raw is None:
                 break
 
+            if raw.data is None:
+                other_packets += 1
+                continue
+
             total_packets += 1
             total_bytes += len(raw.data)
 
-            # Step 1: Parse protocol headers
+            # Step 1: Parse
             try:
                 parsed = self.parser.parse(
                     raw.data,
@@ -65,7 +56,6 @@ class PcapProcessor:
                 other_packets += 1
                 continue
 
-            # Count protocols
             if parsed.has_tcp:
                 tcp_packets += 1
             elif parsed.has_udp:
@@ -77,15 +67,13 @@ class PcapProcessor:
                 forwarded += 1
                 continue
 
-            # Step 2: Build flow key
+            # Step 2: Build flow key (bidirectional)
             protocol_str = "TCP" if parsed.has_tcp else ("UDP" if parsed.has_udp else "OTHER")
-            flow_key = (
-                parsed.src_ip,
-                parsed.dest_ip,
-                parsed.src_port or 0,
-                parsed.dest_port or 0,
-                protocol_str,
-            )
+
+            a = (parsed.src_ip, parsed.src_port or 0)
+            b = (parsed.dest_ip, parsed.dest_port or 0)
+            left, right = sorted([a, b])
+            flow_key = (*left, *right, protocol_str)
 
             # Step 3: Get or create flow
             if flow_key not in flows:
@@ -101,19 +89,16 @@ class PcapProcessor:
             flow.packets += 1
             flow.bytes += len(raw.data)
 
-            # Step 4: Extract domain (SNI / HTTP Host / DNS)
+            # Step 4: Extract domain
             if parsed.payload and len(parsed.payload) > 0:
                 domain = None
 
-                # Try TLS SNI (HTTPS, port 443)
                 if parsed.dest_port == 443:
                     domain = self.extractor.extract_tls_sni(parsed.payload)
 
-                # Try HTTP Host (port 80)
                 if not domain and parsed.dest_port == 80:
                     domain = self.extractor.extract_http_host(parsed.payload)
 
-                # Try DNS (port 53, UDP)
                 if not domain and parsed.dest_port == 53 and parsed.has_udp:
                     domain = self.extractor.extract_dns_query(parsed.payload)
 
@@ -142,12 +127,10 @@ class PcapProcessor:
 
         reader.close()
 
-        # ---- Build app breakdown ----
         for flow in flows.values():
             app = flow.app_type
             app_breakdown[app] = app_breakdown.get(app, 0) + flow.packets
 
-        # ---- Build report ----
         all_connections = list(flows.values())
         blocked_connections = [c for c in all_connections if c.blocked]
 
