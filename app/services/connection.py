@@ -27,9 +27,10 @@ class ConnectionTracker:
     # -------------------------------------------------
 
     def _key(self, tuple: FiveTupleSchema) -> str:
-        return f"{tuple.src_ip}:{tuple.src_port}-" \
-               f"{tuple.dst_ip}:{tuple.dst_port}-" \
-               f"{tuple.protocol}"
+        a = f"{tuple.src_ip}:{tuple.src_port}"
+        b = f"{tuple.dst_ip}:{tuple.dst_port}"
+        left, right = sorted([a, b])
+        return f"{left}-{right}-{tuple.protocol}"
 
     # -------------------------------------------------
     # Core API
