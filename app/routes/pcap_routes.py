@@ -8,24 +8,28 @@ router = APIRouter(prefix="", tags=["PCAP Analysis"])
 
 pcap_processor = PcapProcessor()
 
-
 @router.post("/analyze", response_model=PcapAnalysisReport)
 async def analyze_pcap(file: UploadFile = File(...)):
     """
     Upload a .pcap file and get a full DPI analysis report.
     """
 
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        tmp_path = os.path.join(tmp_dir, file.filename or "upload.pcap")
+    tmp_file = tempfile.NamedTemporaryFile(suffix=".pcap", delete=False)
+    tmp_path = tmp_file.name
 
+    try:
         # Stream write (memory safe)
-        with open(tmp_path, "wb") as f:
-            while chunk := await file.read(1024 * 1024):
-                f.write(chunk)
+        while chunk := await file.read(1024 * 1024):
+            tmp_file.write(chunk)
 
-        # IMPORTANT: close upload file manually
+        tmp_file.close()
         await file.close()
 
         report = await pcap_processor.analyze(tmp_path)
-
         return report
+
+    finally:
+        try:
+            os.unlink(tmp_path)  # guaranteed cleanup
+        except Exception:
+            pass
