@@ -46,7 +46,7 @@ app.include_router(pcap_router)
 app.include_router(ingest_routes.create_router(engine))
 app.include_router(stats_routes.create_router(engine))
 app.include_router(rules_routes.create_router(engine))
-
+ingest_routes.register_exception_handlers(app)
 
 # -------------------------------------------------
 # Root
