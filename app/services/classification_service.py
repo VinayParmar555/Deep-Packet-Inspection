@@ -7,7 +7,6 @@ class ClassificationService:
             return AppType.UNKNOWN
 
         lower_sni = sni.lower()
-
         # Google
         if any(x in lower_sni for x in [
             "google", "gstatic", "googleapis",
@@ -41,9 +40,11 @@ class ClassificationService:
 
         # Twitter / X
         if any(x in lower_sni for x in [
-            "twitter", "twimg", "x.com", "t.co"
-        ]):
+            "twitter", "twimg"
+        ]) or lower_sni == "x.com" or lower_sni.endswith(".x.com") \
+        or lower_sni == "t.co" or lower_sni.endswith(".t.co"):
             return AppType.TWITTER
+
 
         # Netflix
         if any(x in lower_sni for x in [
@@ -53,14 +54,14 @@ class ClassificationService:
 
         # Amazon
         if any(x in lower_sni for x in [
-            "amazon", "amazonaws", "cloudfront", "aws"
-        ]):
+            "amazon", "amazonaws", "cloudfront"
+        ]) or lower_sni == "aws" or lower_sni.endswith(".aws"):
             return AppType.AMAZON
 
         # Microsoft
         if any(x in lower_sni for x in [
-            "microsoft", "msn.com", "office",
-            "azure", "live.com", "outlook", "bing"
+            "microsoft", "msn.com", "azure",
+            "live.com", "outlook", "bing", "office.com", "office365"
         ]):
             return AppType.MICROSOFT
 
