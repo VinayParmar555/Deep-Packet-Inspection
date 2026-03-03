@@ -1,4 +1,3 @@
-import logging
 from fastapi import APIRouter, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
