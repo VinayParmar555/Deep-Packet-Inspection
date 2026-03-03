@@ -12,15 +12,21 @@ class RedisClient:
         self._redis: Optional[redis.Redis] = None
 
     async def connect(self):
-        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+        host = os.getenv("REDIS_HOST")
+        port = int(os.getenv("REDIS_PORT", 6379))
+        db = int(os.getenv("REDIS_DB", 0))
 
-        self._redis = redis.from_url(
-            redis_url,
+        if not host:
+            raise RuntimeError("REDIS_HOST is not set")
+
+        self._redis = redis.Redis(
+            host=host,
+            port=port,
+            db=db,
             encoding="utf-8",
-            decode_responses=True,  # important for string handling
-            max_connections=20
+            decode_responses=True,
+            max_connections=20,
         )
-
         # Test connection
         await self._redis.ping()
 
