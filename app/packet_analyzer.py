@@ -8,9 +8,13 @@ def print_packet_summary(pkt, packet_num):
     print(f"\n========== Packet #{packet_num} ==========")
 
     # Timestamp
-    timestamp = datetime.fromtimestamp(pkt.time)
-    print("Time:", timestamp.strftime("%Y-%m-%d %H:%M:%S.%f"))
-
+# Timestamp — EDecimal fix
+    try:
+        timestamp = datetime.fromtimestamp(float(pkt.time))
+        print("Time:", timestamp.strftime("%Y-%m-%d %H:%M:%S.%f"))
+    except Exception:
+        print("Time: N/A")
+        
     # Ethernet
     if Ether in pkt:
         eth = pkt[Ether]
@@ -76,8 +80,8 @@ def main():
 
         try:
             print_packet_summary(pkt, packet_count)
-        except Exception:
-            print(f"Warning: Failed to parse packet #{packet_count}")
+        except Exception as e:
+            print(f"Warning: Failed to parse packet #{packet_count} | Error: {e}")
             parse_errors += 1
 
         if max_packets and packet_count >= max_packets:
