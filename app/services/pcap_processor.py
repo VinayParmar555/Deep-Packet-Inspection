@@ -33,9 +33,13 @@ class PcapProcessor:
         domains_detected = set()
         app_breakdown: Dict[str, int] = {}
 
+        MAX_PACKETS = 5000
         while True:
             raw = reader.read_next_packet()
             if raw is None:
+                break
+            
+            if total_packets >= MAX_PACKETS:
                 break
 
             if raw.data is None:
