@@ -44,3 +44,9 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+
+# =========================
+# pcap files
+# =========================
+*.pcap
+*.pcapng
