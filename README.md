@@ -102,8 +102,6 @@ python -m venv venv
 # Windows
 venv\Scripts\activate
 
-# macOS / Linux
-source venv/bin/activate
 ```
 
 ### 3. Install Dependencies
@@ -119,20 +117,24 @@ pip install -r requirements.txt
 redis-server
 
 # Or using Docker
-docker run -d -p 6379:6379 redis
+docker compose start
 ```
 
 ### 5. Run the Server
 
 ```bash
+# Windows
 uvicorn main:app --reload
+
+#Docker
+docker compose start
 ```
 
-The server starts at **http://127.0.0.1:8000**
+The server starts at **http://127.0.0.1:8001**
 
 ### 6. Open API Docs
 
-Navigate to **http://127.0.0.1:8000/docs** — interactive Swagger UI with all endpoints.
+Navigate to **http://127.0.0.1:8001/docs** — interactive Swagger UI with all endpoints.
 
 ---
 
@@ -146,7 +148,7 @@ Navigate to **http://127.0.0.1:8000/docs** — interactive Swagger UI with all e
 
 **Example** — Upload and analyze a PCAP file:
 ```bash
-curl -X POST http://127.0.0.1:8000/analyze \
+curl -X POST http://127.0.0.1:8001/analyze \
   -F "file=@test_dpi.pcap"
 ```
 
@@ -182,7 +184,7 @@ curl -X POST http://127.0.0.1:8000/analyze \
 
 **Example:**
 ```bash
-curl -X POST http://127.0.0.1:8000/ingest \
+curl -X POST http://127.0.0.1:8001/ingest \
   -H "Content-Type: application/json" \
   -d '{
     "tuple": {
@@ -215,7 +217,7 @@ curl -X POST http://127.0.0.1:8000/ingest \
 
 **Example** — Block YouTube:
 ```bash
-curl -X POST http://127.0.0.1:8000/rules/app/YOUTUBE
+curl -X POST http://127.0.0.1:8001/rules/app/YOUTUBE
 ```
 
 ---
