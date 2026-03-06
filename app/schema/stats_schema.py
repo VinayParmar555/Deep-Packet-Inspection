@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Dict, List
 
 
 class StatsResponse(BaseModel):
@@ -13,3 +14,9 @@ class StatsResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class AppStatsResponse(BaseModel):
+    app_distribution: Dict[str, int] = Field(default_factory=dict)
+    unique_domains: List[str] = Field(default_factory=list)
+    active_connections: int = 0
