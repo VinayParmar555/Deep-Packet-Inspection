@@ -82,6 +82,10 @@ class ConnectionTracker:
             conn.app_type = app
             conn.sni = sni
 
+    async def update_tcp_state(self, conn: ConnectionSchema, state: str):
+        async with self._lock:
+            conn.tcp_state = state
+
     async def block(self, conn: ConnectionSchema):
         async with self._lock:
             if conn.state != ConnectionState.BLOCKED:
