@@ -77,6 +77,7 @@ class ConnectionSchema(BaseModel):
     packets_out: int = Field(default=0, ge=0)
     bytes_in: int = Field(default=0, ge=0)
     bytes_out: int = Field(default=0, ge=0)
+    tcp_state: Optional[str] = None
 
     @field_validator("last_seen")
     @classmethod
