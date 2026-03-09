@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator, IPvAnyAddress
+from pydantic import BaseModel, Field, field_validator
 from enum import Enum
 from datetime import datetime
 from typing import Optional
