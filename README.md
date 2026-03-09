@@ -90,7 +90,7 @@ flowchart TD
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/deep-packet-inspection.git
+git clone https://github.com/VinayParmar555/Deep-Packet-Inspection.git
 cd deep-packet-inspection
 ```
 
