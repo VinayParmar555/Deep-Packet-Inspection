@@ -90,7 +90,7 @@ class ClassificationService:
             return AppType.SPOTIFY
 
         # Zoom
-        if "zoom" in lower_sni:
+        if lower_sni == "zoom.us" or lower_sni.endswith(".zoom.us"):
             return AppType.ZOOM
 
         # Discord
