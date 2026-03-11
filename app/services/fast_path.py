@@ -1,3 +1,4 @@
+import asyncio
 from typing import Callable, Dict
 
 from app.schema.packet_schema import PacketSchema
@@ -53,7 +54,7 @@ class FastPathProcessor:
 
     async def start(self):
         if not self.task or self.task.done():
-            self.task = __import__("asyncio").get_event_loop().create_task(self.run())
+            self.task = asyncio.get_running_loop().create_task(self.run())
 
     async def stop(self):
         self.input_queue.shutdown()
