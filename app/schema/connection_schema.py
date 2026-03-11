@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from enum import Enum
 from datetime import datetime
 from typing import Optional
@@ -97,5 +97,4 @@ class ConnectionSchema(BaseModel):
             raise ValueError(f"Invalid SNI/domain format: '{v}'")
         return v
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
