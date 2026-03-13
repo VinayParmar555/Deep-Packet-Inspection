@@ -36,20 +36,30 @@ class RuleService:
     # ==============================
 
     async def block_domain(self, domain: str):
-        await redis_client().sadd("blocked:domains", domain.lower())
+        domain = domain.lower()
+        if domain.startswith("*."):
+            await redis_client().sadd("blocked:domains:wildcard", domain)
+        else:
+            await redis_client().sadd("blocked:domains:exact", domain)
 
     async def unblock_domain(self, domain: str):
-        await redis_client().srem("blocked:domains", domain.lower())
+        domain = domain.lower()
+        if domain.startswith("*."):
+            await redis_client().srem("blocked:domains:wildcard", domain)
+        else:
+            await redis_client().srem("blocked:domains:exact", domain)
 
     async def is_domain_blocked(self, domain: str) -> bool:
         domain = domain.lower()
-        blocked = await redis_client().smembers("blocked:domains")
 
-        for rule in blocked:
-            if rule.startswith("*."):
-                if domain.endswith(rule[1:]):
-                    return True
-            elif rule == domain:
+        # O(1) exact match
+        if await redis_client().sismember("blocked:domains:exact", domain):
+            return True
+
+        # O(1) single-level wildcard match: "mail.example.com" → check "*.example.com"
+        parts = domain.split(".", 1)
+        if len(parts) == 2:
+            if await redis_client().sismember("blocked:domains:wildcard", f"*.{parts[1]}"):
                 return True
 
         return False
@@ -104,7 +114,9 @@ class RuleService:
         return list(await redis_client().smembers("blocked:apps"))
 
     async def get_blocked_domains(self):
-        return list(await redis_client().smembers("blocked:domains"))
+        exact = await redis_client().smembers("blocked:domains:exact")
+        wildcards = await redis_client().smembers("blocked:domains:wildcard")
+        return list(exact | wildcards)
 
     async def get_blocked_ports(self):
         return list(await redis_client().smembers("blocked:ports"))
