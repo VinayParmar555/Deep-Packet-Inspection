@@ -1,6 +1,5 @@
 import asyncio
 from typing import Callable, Dict
-
 from app.schema.packet_schema import PacketSchema
 from app.schema.connection_schema import (
     ConnectionState,
