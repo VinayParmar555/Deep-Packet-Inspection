@@ -68,7 +68,6 @@ class PcapProcessor:
                 other_packets += 1
 
             if not parsed.has_ip:
-                forwarded += 1
                 continue
 
             # Step 2: Build flow key (bidirectional)
