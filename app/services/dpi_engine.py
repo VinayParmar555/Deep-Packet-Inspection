@@ -71,6 +71,11 @@ class DPIEngine:
         # ---- Dispatch ----
         action = await self.dispatcher.dispatch(packet)
 
+        if action == "DROPPED":
+            # All worker queues full — handle_output will never fire for this packet
+            await self.stats_service.record_drop()
+            return IngestResponse(status="dropped")
+
         # ---- Rule Check ----
         block_reason = await self.rule_service.should_block(
             src_ip=t.src_ip,
@@ -79,9 +84,9 @@ class DPIEngine:
             domain=packet.domain,
         )
 
-        if block_reason or action == "DROPPED":
+        if block_reason:
             await self.connection_tracker.block(conn)
-            await self.stats_service.record_drop()
+            # Worker observes BLOCKED state → returns DROP → handle_output records the drop
             return IngestResponse(status="dropped")
 
         # ---- Classify if needed ----
@@ -94,8 +99,7 @@ class DPIEngine:
 
         app_label = packet.app_type.value if packet.app_type else "UNKNOWN"
         await self.stats_service.record_app(app_label)
-        await self.stats_service.record_forward()
-
+        # Forward/drop outcome recorded by handle_output when the worker finishes
         return IngestResponse(status="forwarded")
 
     # ==========================================================
@@ -171,5 +175,7 @@ class DPIEngine:
     # ==========================================================
 
     async def handle_output(self, packet: PacketSchema, action: str):
-        if action == "DROP":
+        if action == "ALLOW":
+            await self.stats_service.record_forward()
+        elif action == "DROP":
             await self.stats_service.record_drop()
