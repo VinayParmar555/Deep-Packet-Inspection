@@ -6,6 +6,10 @@ router = APIRouter(prefix="", tags=["Monitoring"])
 
 def create_router(engine: DPIEngine) -> APIRouter:
 
+    @router.get("/health", tags=["Monitoring"])
+    async def health():
+        return {"status": "ok"}
+
     @router.get("/stats")
     async def get_stats():
         return await engine.get_stats()
