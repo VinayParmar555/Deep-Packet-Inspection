@@ -29,6 +29,7 @@ class PcapReader:
         if len(header_bytes) != 24:
             return False
 
+        # magic, version_major, version_minor, thiszone, sigfigs, snaplen, network
         unpacked = struct.unpack("<IHHiiii", header_bytes)
 
         magic = unpacked[0]
