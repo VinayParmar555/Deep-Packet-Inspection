@@ -146,7 +146,7 @@ class DPIEngine:
         }
 
     async def get_dispatch_stats(self) -> dict:
-        return self.dispatcher.get_dispatch_stats()
+        return await self.dispatcher.get_dispatch_stats()
 
     async def get_blocked_domains(self):
         return await self.rule_service.get_blocked_domains()
