@@ -24,7 +24,12 @@ class AppType(str, Enum):
     DNS = "DNS"
     TLS = "TLS"
     QUIC = "QUIC"
+    SSH = "SSH"
+    EMAIL = "EMAIL"
+    STUN_VOIP = "STUN_VOIP"
+    HTTP_ALT = "HTTP_ALT"
     GOOGLE = "GOOGLE"
+    GOOGLE_DNS = "GOOGLE_DNS"
     FACEBOOK = "FACEBOOK"
     YOUTUBE = "YOUTUBE"
     TWITTER = "TWITTER"
@@ -41,6 +46,20 @@ class AppType(str, Enum):
     DISCORD = "DISCORD"
     GITHUB = "GITHUB"
     CLOUDFLARE = "CLOUDFLARE"
+    CLOUDFLARE_DNS = "CLOUDFLARE_DNS"
+    AKAMAI = "AKAMAI"
+    FASTLY = "FASTLY"
+    # New categories for extracted domains
+    ANALYTICS = "ANALYTICS"
+    CDN = "CDN"
+    LINKEDIN = "LINKEDIN"
+    SENTRY = "SENTRY"
+    SUPABASE = "SUPABASE"
+    INTERNAL = "INTERNAL"
+    # Local network infrastructure
+    LOCAL = "LOCAL"
+    GATEWAY = "GATEWAY"
+    WSL = "WSL"
 
 
 class Protocol(str, Enum):
