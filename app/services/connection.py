@@ -151,6 +151,65 @@ class ConnectionTracker:
         async with self._lock:
             return list(self._connections.values())
 
+    async def get_connection_metrics(self, conn: ConnectionSchema) -> dict:
+        """
+        Calculate per-connection metrics:
+        - duration_seconds: Connection lifetime
+        - packets_per_sec: Packet rate for this connection
+        - throughput_bps: Bytes per second for this connection
+        - throughput_mbps: Megabits per second for this connection
+        """
+        async with self._lock:
+            duration = (conn.last_seen - conn.first_seen).total_seconds()
+            total_packets = conn.packets_in + conn.packets_out
+            total_bytes = conn.bytes_in + conn.bytes_out
+
+            if duration <= 0:
+                return {
+                    "duration_seconds": 0.0,
+                    "packets_per_sec": 0.0,
+                    "throughput_bps": 0.0,
+                    "throughput_mbps": 0.0,
+                    "total_packets": total_packets,
+                    "total_bytes": total_bytes,
+                }
+
+            pps = total_packets / duration
+            bps = total_bytes / duration
+            mbps = (total_bytes * 8) / (1_000_000 * duration)
+
+            return {
+                "duration_seconds": round(duration, 3),
+                "packets_per_sec": round(pps, 2),
+                "throughput_bps": round(bps, 2),
+                "throughput_mbps": round(mbps, 4),
+                "total_packets": total_packets,
+                "total_bytes": total_bytes,
+            }
+
+    async def get_all_connection_metrics(self) -> List[dict]:
+        """Get metrics for all active connections."""
+        async with self._lock:
+            connections = list(self._connections.values())
+
+        results = []
+        for conn in connections:
+            metrics = await self.get_connection_metrics(conn)
+            results.append({
+                "connection": {
+                    "src_ip": conn.tuple.src_ip,
+                    "dst_ip": conn.tuple.dst_ip,
+                    "src_port": conn.tuple.src_port,
+                    "dst_port": conn.tuple.dst_port,
+                    "protocol": conn.tuple.protocol.value,
+                    "app_type": conn.app_type.value if conn.app_type else None,
+                    "sni": conn.sni,
+                    "state": conn.state.value,
+                },
+                "metrics": metrics,
+            })
+        return results
+
     async def for_each(self, callback: Callable[[ConnectionSchema], None]):
         async with self._lock:
             for conn in self._connections.values():
