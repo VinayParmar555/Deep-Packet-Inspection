@@ -132,6 +132,14 @@ class DPIEngine:
         snap = await self.stats_service.snapshot()
         return StatsResponse(**snap)
 
+    async def get_rate_metrics(self) -> dict:
+        """Get real-time rate metrics (packets/sec, throughput, etc.)"""
+        return await self.stats_service.get_rate_metrics()
+
+    async def get_connection_metrics(self) -> list:
+        """Get per-connection performance metrics."""
+        return await self.connection_tracker.get_all_connection_metrics()
+
     async def get_app_stats(self) -> dict:
         app_distribution = await self.stats_service.get_app_stats()
         connections = await self.connection_tracker.get_all()
