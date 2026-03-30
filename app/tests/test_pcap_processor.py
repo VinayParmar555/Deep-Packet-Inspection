@@ -41,7 +41,7 @@ def make_processor():
     proc.extractor.extract_tls_sni.return_value = None
     proc.extractor.extract_http_host.return_value = None
     proc.extractor.extract_dns_query.return_value = None
-    proc.classifier.sni_to_app.return_value = MagicMock(value="UNKNOWN")
+    proc.classifier.classify_packet.return_value = MagicMock(value="UNKNOWN")
 
     return proc
 
@@ -87,7 +87,7 @@ class TestPcapProcessor:
         parsed = make_parsed_packet(has_tcp=True, dest_port=80)
         proc.parser.parse.return_value = parsed
         proc.extractor.extract_http_host.return_value = "example.com"
-        proc.classifier.sni_to_app.return_value = MagicMock(value="HTTP")
+        proc.classifier.classify_packet.return_value = MagicMock(value="HTTP")
         proc.rule_service.should_block.return_value = None
 
         raw = make_raw_packet()
@@ -113,7 +113,7 @@ class TestPcapProcessor:
         parsed = make_parsed_packet(has_tcp=False, has_udp=True, dest_port=53)
         proc.parser.parse.return_value = parsed
         proc.extractor.extract_dns_query.return_value = "google.com"
-        proc.classifier.sni_to_app.return_value = MagicMock(value="DNS")
+        proc.classifier.classify_packet.return_value = MagicMock(value="DNS")
         proc.rule_service.should_block.return_value = None
 
         raw = make_raw_packet()
@@ -220,7 +220,7 @@ class TestPcapProcessor:
         parsed = make_parsed_packet(dest_port=443)
         proc.parser.parse.return_value = parsed
         proc.extractor.extract_tls_sni.return_value = "youtube.com"
-        proc.classifier.sni_to_app.return_value = MagicMock(value="YOUTUBE")
+        proc.classifier.classify_packet.return_value = MagicMock(value="YOUTUBE")
         proc.rule_service.should_block.return_value = None
 
         raw = make_raw_packet()
@@ -244,8 +244,8 @@ class TestPcapProcessor:
         proc.parser.parse.return_value = parsed
         proc.rule_service.should_block.return_value = None
 
-        # 1002 packets — should stop at 1000
-        raws = [make_raw_packet() for _ in range(1002)] + [None]
+        # 11002 packets — should stop at 11000
+        raws = [make_raw_packet() for _ in range(11002)] + [None]
 
         with patch("app.services.pcap_processor.PcapReader") as MockReader:
             mock_reader = MagicMock()
@@ -255,7 +255,7 @@ class TestPcapProcessor:
 
             report = await proc.analyze("/test.pcap")
 
-        assert report.total_packets <= 1000
+        assert report.total_packets <= 11000
 
     # ── analyze — multiple packets flow ───
 
@@ -291,7 +291,7 @@ class TestPcapProcessor:
         parsed = make_parsed_packet(dest_port=443)
         proc.parser.parse.return_value = parsed
         proc.extractor.extract_tls_sni.return_value = "youtube.com"
-        proc.classifier.sni_to_app.return_value = MagicMock(value="YOUTUBE")
+        proc.classifier.classify_packet.return_value = MagicMock(value="YOUTUBE")
         proc.rule_service.should_block.return_value = None
 
         raws = [make_raw_packet(), make_raw_packet(), None]
