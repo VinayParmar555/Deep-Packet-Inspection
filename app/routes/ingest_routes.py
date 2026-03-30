@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
+from typing import List
 from app.schema.packet_schema import PacketSchema
 from app.services.dpi_engine import DPIEngine
 
@@ -118,6 +119,47 @@ def create_router(engine: DPIEngine) -> APIRouter:
                     "message": "An unexpected error occurred. Please contact support.",
                 },
             )
+
+    @router.post(
+        "/ingest/batch",
+        status_code=status.HTTP_200_OK,
+        responses={
+            400: {"description": "Invalid packet data"},
+            422: {"description": "Validation error"},
+            500: {"description": "Internal server error"},
+            503: {"description": "DPI engine unavailable"},
+        },
+    )
+    async def ingest_batch(packets: List[PacketSchema], request: Request):
+        """
+        Ingest multiple packets in a single request for high-throughput processing.
+        """
+        if engine is None:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail={
+                    "error": "ServiceUnavailable",
+                    "message": "DPI engine is not available. Please try again later.",
+                },
+            )
+
+        results = {"forwarded": 0, "dropped": 0, "errors": 0}
+
+        for packet in packets:
+            try:
+                result = await engine.ingest_packet(packet)
+                if result.status == "forwarded":
+                    results["forwarded"] += 1
+                else:
+                    results["dropped"] += 1
+            except Exception:
+                results["errors"] += 1
+
+        return {
+            "status": "success",
+            "message": f"Batch of {len(packets)} packets processed",
+            "data": results,
+        }
 
     return router
 
