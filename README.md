@@ -1,4 +1,6 @@
 # 🔍 DPI Backend Service — Deep Packet Inspection Engine
+[![CI/CD](https://github.com/VinayParmar555/Deep-Packet-Inspection/actions/workflows/test.yml/badge.svg)](https://github.com/VinayParmar555/Deep-Packet-Inspection/actions)
+[![codecov](https://codecov.io/gh/VinayParmar555/Deep-Packet-Inspection/badge.svg)](https://codecov.io/gh/VinayParmar555/Deep-Packet-Inspection)
 
 A high-performance **Deep Packet Inspection (DPI)** backend built with **FastAPI**, capable of analyzing network traffic from `.pcap` files or live API ingestion. It extracts TLS SNI, classifies applications (YouTube, Facebook, Netflix, etc.), and enforces blocking rules via Redis.
 
