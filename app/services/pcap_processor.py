@@ -33,13 +33,10 @@ class PcapProcessor:
         domains_detected = set()
         app_breakdown: Dict[str, int] = {}
 
-        MAX_PACKETS = 1000
-        while True:
+        MAX_PACKETS = 11000
+        while total_packets < MAX_PACKETS:
             raw = reader.read_next_packet()
             if raw is None:
-                break
-            
-            if total_packets >= MAX_PACKETS:
                 break
 
             if raw.data is None:
@@ -110,8 +107,14 @@ class PcapProcessor:
                     domains_detected.add(domain)
 
             # Step 5: Classify app
-            if flow.domain and flow.app_type == "UNKNOWN":
-                app_type = self.classifier.sni_to_app(flow.domain)
+            if flow.app_type == "UNKNOWN":
+                app_type = self.classifier.classify_packet(
+                    domain=flow.domain,
+                    src_ip=flow.src_ip,
+                    dst_ip=flow.dst_ip,
+                    src_port=flow.src_port,
+                    dst_port=flow.dst_port,
+                )
                 flow.app_type = app_type.value
 
             # Step 6: Check blocking rules
