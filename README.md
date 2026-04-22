@@ -401,7 +401,7 @@ SYN-ACK       → Allowed
 Client Hello  → SNI: "youtube.com" detected
 Rule Check    → YouTube is BLOCKED
 Flow Marked   → BLOCKED
-All Future    → DROP ❌
+All Future    → DROP 
 ```
 
 ---
